@@ -1,0 +1,8 @@
+Multiple scripts -> Pipeline
+
+- Argsparse / Runner
+- data input
+- preprocessing - transforming/fitting
+- Train - Neural Network / SVM (dump model function)
+- Predict - Neural Network / SVM (use model function)
+- Evaluation
