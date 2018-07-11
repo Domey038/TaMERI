@@ -1,33 +1,37 @@
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.model_selection import train_test_split
+#-----------------------------------------------------#
+#                   Library imports                   #
+#-----------------------------------------------------#
 import pickle
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OneHotEncoder
 
-def prepare_data(data_set):
-    data_set = data_set.drop('car_name', axis=1)
-    x = data_set.drop('mpg',axis=1)
-    y = data_set['mpg']
+
+#-----------------------------------------------------#
+#               Preprocessing functions               #
+#-----------------------------------------------------#
+#Split a data set into data and results according to a provided colname
+def split_data_from_results(data_set, colname):
+    x = data_set.drop(colname, axis=1)
+    y = data_set[colname]
     return x,y
 
+#One-hot-encode (OHE) categorical variables to pseudo-continous variables
 def one_hot_encoder(data, cols):
-    #One-hot encode categorical variables
     enc = OneHotEncoder(categorical_features=cols, handle_unknown='error', n_values='auto', sparse=True)
     data_OHE = enc.fit_transform(data).toarray()
     data_OHE_pd = pd.DataFrame(data_OHE)
     return data_OHE_pd
 
-def split_data(x, y):
-    #split data
-    x_train, x_test, y_train, y_test = train_test_split(x, y)
-    return x_train, x_test, y_train, y_test
-
+#Create a standard scaling fitting of the data
 def create_fitting(data):
     scaler = StandardScaler()
     scaler.fit(data)
-    pickle.dump(scaler, open("data/scaling.pickle", 'wb'))
+    pickle.dump(scaler, open("model/scaling.pickle", 'wb'))
 
+#Fitting of the data according to a already created standard scaling
 def fit_data(data):
-    scaler = pickle.load(open("data/scaling.pickle", 'rb'))
+    scaler = pickle.load(open("model/scaling.pickle", 'rb'))
     data_fitted = scaler.transform(data)
+    data_fitted = pd.DataFrame(data_fitted)
     return data_fitted

@@ -1,6 +1,6 @@
 import Main
-import Evaluation
 import InputReader
-import Prediction
+import NeuralNetwork
 import Preprocessing
-import Training
+import Uniprot_parser
+import Validation

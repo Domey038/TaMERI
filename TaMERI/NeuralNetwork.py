@@ -1,7 +1,27 @@
-from sklearn.neural_network import MLPRegressor
-from sklearn.metrics import mean_absolute_error
+#-----------------------------------------------------#
+#                   Library imports                   #
+#-----------------------------------------------------#
 import Preprocessing as PC
 import pickle
+from sklearn.neural_network import MLPRegressor
+from sklearn.metrics import mean_absolute_error
+
+#-----------------------------------------------------#
+#           Fixed neural network parameters           #
+#-----------------------------------------------------#
+fixed_hidden_layer_sizes = (10)
+fixed_max_iters = 15000
+fixed_activation = 'relu'
+fixed_solver = 'adam'
+
+#-----------------------------------------------------#
+#           -           #
+#-----------------------------------------------------#
+ 
+def create_NeuralNetwork():
+    neural_network = MLPRegressor(hidden_layer_sizes=fixed_hidden_layer_sizes, max_iter=fixed_max_iters,
+                                  solver=fixed_solver, activation=fixed_activation)
+    return neural_network
 
 def calibrate_model_parameter(x, y):
     from sklearn.model_selection import GridSearchCV
@@ -17,32 +37,6 @@ def calibrate_model_parameter(x, y):
     print(cv_results_)
 
 def train_model(x, y):
-    min_MAE = 1000000000000000
-    best_hl = None
-    best_model = None
-    for i in range(1,20):
-        MAE, model = training_iteration(x, y, (i), 5000)
-        if MAE < min_MAE:
-            min_MAE = MAE
-            best_model = MAE
-            best_hl = i
-        print(str(i) + "\t" + str(MAE))
-    print("Single-layer best model: " + str(best_hl) + "\t" + str(min_MAE))
-
-    min_MAE = 1000000000000000
-    best_hl = None
-    best_model = None
-    for i in range(1,20):
-        for j in range(1,20):
-            MAE, model = training_iteration(x, y, (i,j), 5000)
-            if MAE < min_MAE:
-                min_MAE = MAE
-                best_model = MAE
-                best_hl = (i,j)
-            print(str(best_hl) + "\t" + str(MAE))
-    print("BI-layer best model: " + str(best_hl) + "\t" + str(min_MAE))
-
-def training_iteration(x, y, hls, iters):
     #preprocessing (splitting and fitting)
     x_train, x_test, y_train, y_test = PC.split_data(x,y)
     PC.create_fitting(x_train)
@@ -59,6 +53,6 @@ def training_iteration(x, y, hls, iters):
     return MAE, model
 
 def predict(data):
-    model = pickle.load(open("data/NN_model.pickle", 'rb'))
+    model = pickle.load(open("model/NN_model.pickle", 'rb'))
     predictions = model.predict(data)
     return predictions
