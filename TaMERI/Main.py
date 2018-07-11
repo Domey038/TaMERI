@@ -23,9 +23,9 @@ Lab: Frishman lab - TUM Weihenstephan (Germany)
 """)
 #Add arguments
 parser.add_argument('-i', '--input', type=str, action='store', required=False, dest='args_input',
-                    help='Path to a UniProt flat file in txt format')
+                    help='Path to a data set (UniProt flat file or TaMERI-input.tsv file)')
 parser.add_argument('-t', '--train', type=str, action='store', required=False, dest='args_train',
-                    help='Path to a training data set')
+                    help='Path to a training data set (TaMERI-input.tsv file)')
 parser.add_argument('-c', '--calibrate', default=False, action='store_true', dest='args_calibration',
                     help='Boolean tag if the neural network parameters should be automatically calibrated depending on the\
                     provided training data set or fixed parameters should be used\
@@ -48,7 +48,7 @@ boolean_calibration = args.args_calibration
 #-----------------------------------------------------#
 #                    Runner code                      #
 #-----------------------------------------------------#
-#Read data
+#Read data set
 import InputReader as IR
 mpg_dataset = IR.read_TestSet("data/mpg.tsv")
 
