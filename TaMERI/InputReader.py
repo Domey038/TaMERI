@@ -9,7 +9,9 @@ import pandas as pd
 def read_TaMERI_tsv(path):
     #Read the tab seperated vector table (TSV) via Numpy
     data_set = pd.read_csv(path, sep="\t")
-    print(data_set)
+    #Temporary remove protein names
+    #TODO: save them and add them later to the corresponding prediction output
+    data_set = data_set.drop('id', axis=1)
     return data_set
 
 #-----------------------------------------------------#

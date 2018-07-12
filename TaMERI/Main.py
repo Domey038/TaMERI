@@ -86,12 +86,13 @@ boolean_calibration = args.args_calibration
 ############################
 if path_trainingData != None:
     #Read data set in TaMERI-input.tsv format (AAIMON slopes have to be provided)
-    #data_set = IR.read_TaMERI_tsv(path_trainingData)
-    data_set = TaMERI_IR.read_TestSet(path_trainingData)
+    data_set = TaMERI_IR.read_TaMERI_tsv(path_trainingData)
+    #Preprocessing: Remove non-finite results
+    data_set = TaMERI_PC.clean_data(data_set)
     #Preprocessing: Split data and results of the data set
-    set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "mpg")
+    set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "AAIMON_slope")
     #Preprocessing: Transform categorical features via OHE
-    set_x = TaMERI_PC.one_hot_encoder(set_x, [6])
+    #set_x = TaMERI_PC.one_hot_encoder(set_x, [6])
     #Preprocessing: Create and fit data through standard scaling
     TaMERI_PC.create_fitting(set_x)
     set_x = TaMERI_PC.fit_data(set_x)
@@ -111,10 +112,9 @@ if path_trainingData != None:
 ############################
 elif path_predictionData != None:
     #Read data set in TaMERI-input.tsv format or in an UniProt flat file format
-    #data_set = IR.read_TaMERI_tsv(path_predictionData)
-    data_set = TaMERI_IR.read_TestSet(path_predictionData)
+    data_set = TaMERI_IR.read_TaMERI_tsv(path_predictionData)
     #Preprocessing: Transform categorical features via OHE
-    data_set = TaMERI_PC.one_hot_encoder(data_set, [6])
+    #data_set = TaMERI_PC.one_hot_encoder(data_set, [])
     #Preprocessing: Fit the data through the saved standard scaling
     data_set = TaMERI_PC.fit_data(data_set)
     #Create a neural network object
@@ -131,12 +131,13 @@ elif path_predictionData != None:
 ############################
 elif path_validationData != None:
     #Read data set in TaMERI-input.tsv format (AAIMON slopes have to be provided)
-    #data_set = IR.read_TaMERI_tsv(path_validationData)
-    data_set = TaMERI_IR.read_TestSet(path_validationData)
+    data_set = TaMERI_IR.read_TaMERI_tsv(path_validationData)
+    #Preprocessing: Remove non-finite results
+    data_set = TaMERI_PC.clean_data(data_set)
     #Preprocessing: Split data and results of the data set
-    set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "mpg")
+    set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "AAIMON_slope")
     #Preprocessing: Transform categorical features via OHE
-    set_x = TaMERI_PC.one_hot_encoder(set_x, [6])
+    #set_x = TaMERI_PC.one_hot_encoder(set_x, [])
     #Preprocessing: Create and fit data through standard scaling
     TaMERI_PC.create_fitting(set_x)
     set_x = TaMERI_PC.fit_data(set_x)

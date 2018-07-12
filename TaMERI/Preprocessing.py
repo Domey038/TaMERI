@@ -3,6 +3,7 @@
 #-----------------------------------------------------#
 import pickle
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 
@@ -15,6 +16,11 @@ def split_data_from_results(data_set, colname):
     x = data_set.drop(colname, axis=1)
     y = data_set[colname]
     return x,y
+
+#Remove non-finite values
+def clean_data(data_set):
+    data_set = data_set[np.isfinite(data_set['AAIMON_slope'])]
+    return data_set
 
 #One-hot-encode (OHE) categorical variables to pseudo-continous variables
 def one_hot_encoder(data, cols):
