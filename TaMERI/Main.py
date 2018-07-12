@@ -116,29 +116,7 @@ elif path_validationData != None:
     TaMERI_PC.create_fitting(set_x)
     set_x = TaMERI_PC.fit_data(set_x)
     #Validate TaMERI through a 5-fold cross-validation
-    if boolean_calibration:
-        TaMERI_VAL.calibrate()
-    else:
-        TaMERI_VAL.cross_validation(set_x, set_y)
-
-
-
-#Validation
-#IF Validation==TRUE/was choosen
-#-> read data set
-#-> preprocess data set
-#-> IF calibrate==TRUE -> calibrate with cv=5 + output results (check up if this is even possible)
-#ELSE
-#-> CV5 : train with fixed neural network parameters and predict
-#output results
-
-
-
-
-
-
-
-
+    TaMERI_VAL.cross_validation(set_x, set_y)
 
 
 
