@@ -5,6 +5,7 @@ import Preprocessing as PC
 import pickle
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import GridSearchCV
 
 #-----------------------------------------------------#
 #           Fixed neural network parameters           #
@@ -45,16 +46,16 @@ class neural_network:
         with open("model/NN_model.pickle", 'rb') as nn_load:
             self.model = pickle.load(nn_load)
 
-    # #PLACEHOLDER
-    # def calibrate(x, y):
-    #     from sklearn.model_selection import GridSearchCV
-    #     model = MLPRegressor(max_iter=15000)
-    #     param_grid = [{'activation':['identity', 'logistic', 'tanh', 'relu'],
-    #                 'solver':['lbfgs', 'adam'],
-    #                 'hidden_layer_sizes':[(1), (5), (10), (15), (20), (1,1), (5,5), (10,10), (15,15), (20,20), (10,5), (5,10)]}]
-    #     clf = GridSearchCV(model, param_grid, cv=3, scoring='neg_mean_absolute_error')
-    #     clf.fit(x,y)
-    #
-    #     print("Best parameters set found on development set:")
-    #     print(str(best_score_) + "\t" + str(clf.best_params_))
-    #     print(cv_results_)
+    #Automatically identify best parameters for the neural network
+    def calibrate(self, x, y):
+        self.model = MLPRegressor(max_iter=15000)
+        param_grid = [{'activation':['identity', 'logistic', 'tanh', 'relu'],
+                    'solver':['lbfgs', 'adam'],
+                    'hidden_layer_sizes':[(1), (5), (10), (15), (20), (1,1), (5,5), (10,10), (15,15), (20,20), (10,5), (5,10)]}]
+        clf = GridSearchCV(self.model, param_grid, cv=5, scoring='neg_mean_absolute_error')
+        clf.fit(x,y)
+        self.dump()
+
+        print("Best parameters set found on development set:")
+        print(str(clf.best_score_) + "\t" + str(clf.best_params_))
+        print(str(clf.cv_results_))

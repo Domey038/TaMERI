@@ -29,27 +29,32 @@ parser = MyParser(formatter_class=argparse.RawDescriptionHelpFormatter, add_help
 Prediction of transmembrane influence on the evolutionary rate of membrane proteins through protein determinants.
 Trained on AAIMON slopes from the Korbinian pipeline as representative for TM/EM ER ratios.
 
+Example usage:
+python TaMERI/main.py -t data/training_set.TaMERI.tsv
+python TaMERI/main.py -p data/test_set.TaMERI.tsv
+
 Author: Dominink Müller
 Email: ga37xiy@tum.de
 Lab: Frishman lab - TUM Weihenstephan (Germany)
 """)
 #Add arguments for mutally exclusive required group
-required_group = parser.add_argument_group(title='Required + mutally exclusive arguments')
+required_group = parser.add_argument_group(title='TaMERI modi')
 exclusive_args = required_group.add_mutually_exclusive_group(required=True)
-exclusive_args.add_argument('-i', '--input', type=str, action='store', required=False, dest='args_input',
-                    help='Path to a data set (UniProt flat file or TaMERI-input.tsv file)')
+exclusive_args.add_argument('-p', '--predict', type=str, action='store', required=False, dest='args_predict',
+                    help='Path to a prediction data set (UniProt flat file or TaMERI-input.tsv file)')
 exclusive_args.add_argument('-t', '--train', type=str, action='store', required=False, dest='args_train',
                     help='Path to a training data set (TaMERI-input.tsv file)')
 exclusive_args.add_argument('-v', '--validate', type=str, action='store', required=False, dest='args_validate',
-                    help='Execute a 5-fold cross-validation with 4/5 training and 1/5 testing data set size.\
-                    Outputs evaluation results.\
-                    Path to a data set (TaMERI-input.tsv file)')
+                    help='Path to a data set (TaMERI-input.tsv file).\
+                    Execute a 5-fold cross-validation with 4/5 training and 1/5 testing data set size.\
+                    Outputs evaluation results.')
 #Add arguments for optional group
 optional_group = parser.add_argument_group(title='Optional arguments')
-# optional_group.add_argument('-c', '--calibrate', default=False, action='store_true', dest='args_calibration',
-#                     help='Boolean tag if the neural network parameters should be automatically calibrated depending on the\
-#                     provided training data set or fixed parameters should be used\
-#                     (which was selected by me as the best for this problem)')
+optional_group.add_argument('-c', '--calibrate', default=False, action='store_true', dest='args_calibration',
+                    help='Boolean tag, if the neural network parameters should be automatically calibrated depending on the\
+                    provided training data set (instead of using TaMERI\'s fixed parameters).\
+                    Only affect the training modus.\
+                    WARNING: It is NOT recommended to use this argument if your data set isn\'t sufficient for training.')
 optional_group.add_argument('-m', '--model', type=str, action='store', required=False, dest='args_model',
                     help='NOT IMPLEMENTED YET!\
                     Use a external/own neural network model instead of using the model provided by TaMERI.\
@@ -64,15 +69,14 @@ args = parser.parse_args()
 #-----------------------------------------------------#
 #                     Parameters                      #
 #-----------------------------------------------------#
-#Path to input data for which predictions should be calculated
-path_inputData = args.args_input
+#Path to prediction data for which predictions should be calculated
+path_predictionData = args.args_predict
 #Path to training data for which a own neural network model can be trained
 path_trainingData = args.args_train
 #Path to data set for evaluate prediction power with a 5-fold cross-validation
 path_validationData = args.args_validate
 #Boolean tag, if the neural network parameter should be automatically calibrated depending on the training data set
-#boolean_calibration = args.args_calibration
-boolean_calibration = False
+boolean_calibration = args.args_calibration
 
 #-----------------------------------------------------#
 #                    Runner code                      #
@@ -93,18 +97,22 @@ if path_trainingData != None:
     set_x = TaMERI_PC.fit_data(set_x)
     #Create a neural network object
     neural_network = TaMERI_NN.neural_network()
-    #Train the neural network with all of provided data
-    neural_network.train(set_x, set_y)
+    if not boolean_calibration:
+        #Train the neural network with all of provided data
+        neural_network.train(set_x, set_y)
+    else:
+        #Calibrate the neural network model to find best parameters
+        neural_network.calibrate(set_x, set_y)
     #Dump the trained neural network model for later usage/prediction
     neural_network.dump()
 
 ############################
 #        Prediction        #
 ############################
-elif path_inputData != None:
+elif path_predictionData != None:
     #Read data set in TaMERI-input.tsv format or in an UniProt flat file format
-    #data_set = IR.read_TaMERI_tsv(path_trainingData)
-    data_set = TaMERI_IR.read_TestSet(path_inputData)
+    #data_set = IR.read_TaMERI_tsv(path_predictionData)
+    data_set = TaMERI_IR.read_TestSet(path_predictionData)
     #Preprocessing: Transform categorical features via OHE
     data_set = TaMERI_PC.one_hot_encoder(data_set, [6])
     #Preprocessing: Fit the data through the saved standard scaling
