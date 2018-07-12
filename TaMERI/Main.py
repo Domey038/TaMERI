@@ -12,6 +12,7 @@ import pandas as pd
 import InputReader as TaMERI_IR
 import Preprocessing as TaMERI_PC
 import Validation as TaMERI_VAL
+import NeuralNetwork as TaMERI_NN
 
 #-----------------------------------------------------#
 #                  Parse command line                 #
@@ -79,27 +80,43 @@ boolean_calibration = False
 ############################
 #         Training         #
 ############################
-if path_inputData != None:
-    sys.exit(0)
-#Training
-#IF TRAINING==TRUE/was choosen
-#-> read training data set
-#-> preprocess training data set
-#-> IF calibrate==TRUE -> calibrate
-#-> Train with fixed/calibrated values
-#ELSE
-#-> use existing model+scaling
+if path_trainingData != None:
+    #Read data set in TaMERI-input.tsv format (AAIMON slopes have to be provided)
+    #data_set = IR.read_TaMERI_tsv(path_trainingData)
+    data_set = TaMERI_IR.read_TestSet(path_trainingData)
+    #Preprocessing: Split data and results of the data set
+    set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "mpg")
+    #Preprocessing: Transform categorical features via OHE
+    set_x = TaMERI_PC.one_hot_encoder(set_x, [6])
+    #Preprocessing: Create and fit data through standard scaling
+    TaMERI_PC.create_fitting(set_x)
+    set_x = TaMERI_PC.fit_data(set_x)
+    #Create a neural network object
+    neural_network = TaMERI_NN.neural_network()
+    #Train the neural network with all of provided data
+    neural_network.train(set_x, set_y)
+    #Dump the trained neural network model for later usage/prediction
+    neural_network.dump()
 
 ############################
 #        Prediction        #
 ############################
-elif path_trainingData != None:
-    sys.exit(0)
-#Prediction
-#ELSE_IF PREDICTION==TRUE/was choosen
-#-> read input data / parse Uniprot format into TaMERI tsv
-#-> preprocess (scale) data
-#-> use existing model for
+elif path_inputData != None:
+    #Read data set in TaMERI-input.tsv format or in an UniProt flat file format
+    #data_set = IR.read_TaMERI_tsv(path_trainingData)
+    data_set = TaMERI_IR.read_TestSet(path_inputData)
+    #Preprocessing: Transform categorical features via OHE
+    data_set = TaMERI_PC.one_hot_encoder(data_set, [6])
+    #Preprocessing: Fit the data through the saved standard scaling
+    data_set = TaMERI_PC.fit_data(data_set)
+    #Create a neural network object
+    neural_network = TaMERI_NN.neural_network()
+    #Load the trained neural network model from disk
+    neural_network.load()
+    #Calculate predictions with the neural network model
+    predictions = neural_network.predict(data_set)
+    #Output the predictions to console
+    print(predictions)
 
 ############################
 #        Validation        #
@@ -117,19 +134,3 @@ elif path_validationData != None:
     set_x = TaMERI_PC.fit_data(set_x)
     #Validate TaMERI through a 5-fold cross-validation
     TaMERI_VAL.cross_validation(set_x, set_y)
-
-
-
-
-# #Prediction
-# mpg_dataset = IR.read_TestSet("data/mpg.tsv")
-#
-# #preprocess data
-# x, y = PC.prepare_data(mpg_dataset)
-# x = PC.one_hot_encoder(x, [6])
-#
-# #create the neural network
-# import NeuralNetwork as NN
-# #NN.train_model(x,y)
-#
-# NN.calibrate_model_parameter(x,y)
