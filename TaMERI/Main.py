@@ -27,7 +27,7 @@ class MyParser(argparse.ArgumentParser):
 parser = MyParser(formatter_class=argparse.RawDescriptionHelpFormatter, add_help=False, description=
     """TaMERI: TrAnsMembrane Evolutionary Rate Influence - Neural network predictor
 Prediction of transmembrane influence on the evolutionary rate of membrane proteins through protein determinants.
-Trained on AAIMON slopes from the Korbinian pipeline as representative for TM/EM ER ratios.
+Trained on AAIMON rates from the Korbinian pipeline as representative for TM/EM ER ratios.
 
 Example usage:
 python TaMERI/main.py -t data/training_set.TaMERI.tsv
@@ -87,12 +87,13 @@ boolean_calibration = args.args_calibration
 if path_trainingData != None:
     #Read data set in TaMERI-input.tsv format (AAIMON slopes have to be provided)
     data_set = TaMERI_IR.read_TaMERI_tsv(path_trainingData)
+    #data_set = TaMERI_IR.read_r4s_tsv(path_trainingData)
     #Preprocessing: Remove non-finite results
     data_set = TaMERI_PC.clean_data(data_set)
     #Preprocessing: Split data and results of the data set
-    set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "AAIMON_slope")
-    #Preprocessing: Transform categorical features via OHE
-    #set_x = TaMERI_PC.one_hot_encoder(set_x, [6])
+    set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "ER_ratio")
+    #Preprocessing: Transform categorical features into dummy variables
+    set_x = TaMERI_PC.create_dummy_variables(set_x, ['C', 'F', 'P'])
     #Preprocessing: Create and fit data through standard scaling
     TaMERI_PC.create_fitting(set_x)
     set_x = TaMERI_PC.fit_data(set_x)
@@ -113,8 +114,8 @@ if path_trainingData != None:
 elif path_predictionData != None:
     #Read data set in TaMERI-input.tsv format or in an UniProt flat file format
     data_set = TaMERI_IR.read_TaMERI_tsv(path_predictionData)
-    #Preprocessing: Transform categorical features via OHE
-    #data_set = TaMERI_PC.one_hot_encoder(data_set, [])
+    #Preprocessing: Transform categorical features into dummy variables
+    data_set = TaMERI_PC.create_dummy_variables(data_set, ['C', 'F', 'P'])
     #Preprocessing: Fit the data through the saved standard scaling
     data_set = TaMERI_PC.fit_data(data_set)
     #Create a neural network object
@@ -132,12 +133,13 @@ elif path_predictionData != None:
 elif path_validationData != None:
     #Read data set in TaMERI-input.tsv format (AAIMON slopes have to be provided)
     data_set = TaMERI_IR.read_TaMERI_tsv(path_validationData)
+    #data_set = TaMERI_IR.read_r4s_tsv(path_validationData)
     #Preprocessing: Remove non-finite results
     data_set = TaMERI_PC.clean_data(data_set)
     #Preprocessing: Split data and results of the data set
-    set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "AAIMON_slope")
-    #Preprocessing: Transform categorical features via OHE
-    #set_x = TaMERI_PC.one_hot_encoder(set_x, [])
+    set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "ER_ratio")
+    #Preprocessing: Transform categorical features into dummy variables
+    set_x = TaMERI_PC.create_dummy_variables(set_x, ['C', 'F', 'P'])
     #Preprocessing: Create and fit data through standard scaling
     TaMERI_PC.create_fitting(set_x)
     set_x = TaMERI_PC.fit_data(set_x)

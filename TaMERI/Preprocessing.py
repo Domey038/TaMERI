@@ -19,7 +19,15 @@ def split_data_from_results(data_set, colname):
 
 #Remove non-finite values
 def clean_data(data_set):
-    data_set = data_set[np.isfinite(data_set['AAIMON_slope'])]
+    data_set = data_set[np.isfinite(data_set['ER_ratio'])]
+    return data_set
+
+#Create dummy variables for the categorical variables to pseudo-continous variables
+def create_dummy_variables(data_set, cols):
+    for col in cols:
+        dv = data_set[col].str.join('|').str.get_dummies()
+        data_set = data_set.drop(col, axis=1)
+        data_set = pd.concat([data_set, dv], axis=1)
     return data_set
 
 #One-hot-encode (OHE) categorical variables to pseudo-continous variables
