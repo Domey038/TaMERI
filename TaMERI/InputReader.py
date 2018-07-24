@@ -12,7 +12,7 @@ def read_TaMERI_tsv(path):
     data_set = pd.read_csv(path, sep="\t")
     #Assign protein ids as index for each row
     #data_set = data_set.set_index('id')
-    #data_set = data_set.drop('id', axis=1)
+    data_set = data_set.drop('id', axis=1)
     #convert gene ontology terms into lists (instead of default strings)
     data_set = data_set.assign(F=data_set.F.str.strip('[]').str.split(','))
     data_set = data_set.assign(C=data_set.C.str.strip('[]').str.split(','))
