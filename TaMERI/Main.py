@@ -69,6 +69,10 @@ args = parser.parse_args()
 #-----------------------------------------------------#
 #                     Parameters                      #
 #-----------------------------------------------------#
+#Define which machine learning algorithm should be used for validation
+#NN = Neural Network; RF = Random Forest
+validation_ML_algorithm = 'NN'
+
 #Path to prediction data for which predictions should be calculated
 path_predictionData = args.args_predict
 #Path to training data for which a own neural network model can be trained
@@ -144,4 +148,4 @@ elif path_validationData != None:
     TaMERI_PC.create_fitting(set_x)
     set_x = TaMERI_PC.fit_data(set_x)
     #Validate TaMERI through a 5-fold cross-validation
-    TaMERI_VAL.cross_validation(set_x, set_y)
+    TaMERI_VAL.cross_validation(set_x, set_y, validation_ML_algorithm)

@@ -10,9 +10,9 @@ from sklearn.model_selection import GridSearchCV
 #-----------------------------------------------------#
 #           Fixed neural network parameters           #
 #-----------------------------------------------------#
-fixed_hidden_layer_sizes = (10,10)
+fixed_hidden_layer_sizes = (8)
 fixed_max_iters = 15000
-fixed_activation = 'relu'
+fixed_activation = 'tanh'
 fixed_solver = 'lbfgs'
 
 #-----------------------------------------------------#
