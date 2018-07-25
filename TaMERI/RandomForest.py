@@ -10,6 +10,12 @@ from sklearn.model_selection import GridSearchCV
 #-----------------------------------------------------#
 #            Fixed random forest parameters           #
 #-----------------------------------------------------#
+fixed_n_estimators = None
+fixed_max_depth = None
+fixed_max_features = None
+fixed_min_samples_split = None
+fixed_min_samples_leaf = None
+fixed_bootstrap = None
 
 #-----------------------------------------------------#
 #          Functions of class random_forest           #
@@ -20,7 +26,9 @@ class random_forest:
 
     #Create a random forest model with fixed parameters
     def __init__(self):
-        self.model = RandomForestRegressor()
+        self.model = RandomForestRegressor(random_state=0, n_estimators=fixed_n_estimators, max_depth=fixed_max_depth,
+                                            min_samples_split=fixed_min_samples_split, min_samples_leaf=fixed_min_samples_leaf,
+                                            bootstrap=fixed_bootstrap)
 
     #Train the random forest model according to provided training data set
     def train(self, train_x, train_y):
@@ -44,7 +52,7 @@ class random_forest:
     #Automatically identify best parameters for the random forest model
     def calibrate(self, x, y):
         self.model = RandomForestRegressor(random_state=0)
-        param_grid = {"n_estimators": [200, 500],
+        param_grid = {"n_estimators": [50, 100, 150, 200, 500, 1000, 2500, 5000],
             "max_depth": [3, None],
             "max_features": ['auto', 'sqrt', 1, 3, 5, 10],
             "min_samples_split": [2, 5, 10],

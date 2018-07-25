@@ -25,7 +25,7 @@ class neural_network:
     #Create a neural network model with fixed parameters
     def __init__(self):
         self.model = MLPRegressor(hidden_layer_sizes=fixed_hidden_layer_sizes, max_iter=fixed_max_iters,
-                                  solver=fixed_solver, activation=fixed_activation)
+                                  solver=fixed_solver, activation=fixed_activation, random_state=0)
 
     #Train the neural network model according to provided training data set
     def train(self, train_x, train_y):
@@ -48,7 +48,7 @@ class neural_network:
 
     #Automatically identify best parameters for the neural network
     def calibrate(self, x, y):
-        self.model = MLPRegressor(max_iter=15000)
+        self.model = MLPRegressor(max_iter=15000, random_state=0)
         param_grid = [{'activation':['identity', 'logistic', 'tanh', 'relu'],
                     'solver':['lbfgs', 'adam', 'sgd'],
                     'hidden_layer_sizes':[(1), (2), (3), (4), (5), (6), (7), (8), (9), (10),

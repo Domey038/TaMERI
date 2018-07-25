@@ -82,7 +82,7 @@ def read_UniProt(pathUniProt):
 #-----------------------------------------------------#
 #                  Run goslimviewer                   #
 #-----------------------------------------------------#
-def run_goslimviewer(protein_list):
+def run_goslimviewer(protein_list, slim_set):
     #Save and then change the current working directory into the goslimviewer directory
     original_wd = os.getcwd()
     os.chdir(args.args_gsv)
@@ -97,9 +97,9 @@ def run_goslimviewer(protein_list):
             for go_term in goTerms:
                 go_writer.write(str(uniprot_id) + "\t" + str(go_term) + "\n")
     #Run goslimviewer
-    out = subprocess.call(["perl", "goslimviewer_standalone.pl", "-i", path_tmp_input, "-s", "generic", "-o", path_tmp_output])
+    out = subprocess.call(["perl", "goslimviewer_standalone.pl", "-i", path_tmp_input, "-s", slim_set, "-o", path_tmp_output])
     #Read output into cache
-    path_tmp_output_mapping = path_tmp_output + ".generic.s2p2g.txt"
+    path_tmp_output_mapping = path_tmp_output + "." + slim_set + ".s2p2g.txt"
     go_classification = {}
     with open(path_tmp_output_mapping, 'r') as goClassification_reader:
         header_line = next(goClassification_reader)
@@ -121,11 +121,11 @@ def run_goslimviewer(protein_list):
             go_classification[uniprot_id][hierarchy].add(go_term)
     #Remove temporary files and change working directory to default again
     os.remove(path_tmp_input)
-    os.remove(path_tmp_output + ".generic.s2p2g.txt")
-    os.remove(path_tmp_output + ".generic.errors.txt")
-    os.remove(path_tmp_output + ".generic.bp.txt")
-    os.remove(path_tmp_output + ".generic.cc.txt")
-    os.remove(path_tmp_output + ".generic.mf.txt")
+    os.remove(path_tmp_output + "." + slim_set + ".s2p2g.txt")
+    os.remove(path_tmp_output + "." + slim_set + ".errors.txt")
+    os.remove(path_tmp_output + "." + slim_set + ".bp.txt")
+    os.remove(path_tmp_output + "." + slim_set + ".cc.txt")
+    os.remove(path_tmp_output + "." + slim_set + ".mf.txt")
     os.chdir(original_wd)
     #return results
     return go_classification
@@ -162,7 +162,10 @@ TaMERI_df = TaMERI_df.merge(temporary_df, left_on='id', right_on='id', how='inne
 protein_list = read_UniProt(args.args_uniprot)
 
 #Run goslimviewer
-go_classification = run_goslimviewer(protein_list)
+# slim set can be "generic", "metagenomics", "goa", "panther", "pir", "plant", "tigr", "yeast"
+# check gene ontology documentation for slim sets to get detailed information about the slim set content for each
+slim_set = "metagenomics"
+go_classification = run_goslimviewer(protein_list, slim_set)
 
 #convert Gene Ontology classification from sets to lists
 for uni_id in go_classification:
