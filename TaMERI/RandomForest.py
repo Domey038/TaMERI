@@ -10,12 +10,12 @@ from sklearn.model_selection import GridSearchCV
 #-----------------------------------------------------#
 #            Fixed random forest parameters           #
 #-----------------------------------------------------#
-fixed_n_estimators = None
+fixed_n_estimators = 200
 fixed_max_depth = None
-fixed_max_features = None
-fixed_min_samples_split = None
-fixed_min_samples_leaf = None
-fixed_bootstrap = None
+fixed_max_features = 'sqrt'
+fixed_min_samples_split = 2
+fixed_min_samples_leaf = 7
+fixed_bootstrap = False
 
 #-----------------------------------------------------#
 #          Functions of class random_forest           #
