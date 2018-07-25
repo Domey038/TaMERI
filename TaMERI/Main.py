@@ -49,6 +49,13 @@ exclusive_args.add_argument('-v', '--validate', type=str, action='store', requir
                     help='Path to a data set (TaMERI-input.tsv file).\
                     Execute a 5-fold cross-validation with 4/5 training and 1/5 testing data set size.\
                     Outputs evaluation results.')
+#Add arguments for the machine learning algorithm group
+mla_group_fw = parser.add_argument_group(title='Machine learning algorithm')
+mla_group = mla_group_fw.add_mutually_exclusive_group(required=False)
+mla_group.add_argument('-NN', '--neural_network', default=False, action='store_true', dest='args_MLA_NN',
+                    help='Boolean variable, if a neural network algorithm should be used (DEFAULT)')
+mla_group.add_argument('-RF', '--random_forest', default=False, action='store_true', dest='args_MLA_RF',
+                    help='Boolean variable, if a random forest algorithm should be used')
 #Add arguments for optional group
 optional_group = parser.add_argument_group(title='Optional arguments')
 optional_group.add_argument('-c', '--calibrate', default=False, action='store_true', dest='args_calibration',
@@ -70,18 +77,23 @@ args = parser.parse_args()
 #-----------------------------------------------------#
 #                     Parameters                      #
 #-----------------------------------------------------#
-#Define which machine learning algorithm should be used for validation
-#NN = Neural Network; RF = Random Forest
-validation_ML_algorithm = 'RF'
-
 #Path to prediction data for which predictions should be calculated
 path_predictionData = args.args_predict
 #Path to training data for which a own neural network model can be trained
 path_trainingData = args.args_train
 #Path to data set for evaluate prediction power with a 5-fold cross-validation
 path_validationData = args.args_validate
+
 #Boolean tag, if the neural network parameter should be automatically calibrated depending on the training data set
 boolean_calibration = args.args_calibration
+
+#Define which machine learning algorithm should be used for validation
+#NN = Neural Network; RF = Random Forest - DEFAULT = NN
+validation_ML_algorithm = 'NN'
+if args.args_MLA_NN:
+    validation_ML_algorithm = 'NN'
+elif args.args_MLA_RF:
+    validation_ML_algorithm = 'RF'
 
 #-----------------------------------------------------#
 #                    Runner code                      #

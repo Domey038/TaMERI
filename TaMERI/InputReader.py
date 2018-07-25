@@ -1,6 +1,8 @@
 #-----------------------------------------------------#
 #                   Library imports                   #
 #-----------------------------------------------------#
+import os.path
+import sys
 import pandas as pd
 import re
 
@@ -8,6 +10,9 @@ import re
 #      Read a data set in TaMERI-input.tsv format     #
 #-----------------------------------------------------#
 def read_TaMERI_tsv(path):
+    #check if file exists else throw error
+    if not os.path.exists(path):
+        sys.exit("Provided file doesn't exist.")
     #Read the tab seperated vector table (TSV) via Numpy
     data_set = pd.read_csv(path, sep="\t")
     #Assign protein ids as index for each row
