@@ -13,6 +13,7 @@ import InputReader as TaMERI_IR
 import Preprocessing as TaMERI_PC
 import Validation as TaMERI_VAL
 import NeuralNetwork as TaMERI_NN
+import RandomForest as TaMERI_RF
 
 #-----------------------------------------------------#
 #                  Parse command line                 #
@@ -71,7 +72,7 @@ args = parser.parse_args()
 #-----------------------------------------------------#
 #Define which machine learning algorithm should be used for validation
 #NN = Neural Network; RF = Random Forest
-validation_ML_algorithm = 'NN'
+validation_ML_algorithm = 'RF'
 
 #Path to prediction data for which predictions should be calculated
 path_predictionData = args.args_predict
@@ -101,16 +102,20 @@ if path_trainingData != None:
     #Preprocessing: Create and fit data through standard scaling
     TaMERI_PC.create_fitting(set_x)
     set_x = TaMERI_PC.fit_data(set_x)
-    #Create a neural network object
-    neural_network = TaMERI_NN.neural_network()
+    #Create a ML predictor model
+    ML_predictor = None
+    if validation_ML_algorithm == "NN":
+        ML_predictor = TaMERI_NN.neural_network()
+    elif validation_ML_algorithm == "RF":
+        ML_predictor = TaMERI_RF.random_forest()
     if not boolean_calibration:
-        #Train the neural network with all of provided data
-        neural_network.train(set_x, set_y)
+        #Train the ML predictor model with all of provided data
+        ML_predictor.train(set_x, set_y)
     else:
-        #Calibrate the neural network model to find best parameters
-        neural_network.calibrate(set_x, set_y)
-    #Dump the trained neural network model for later usage/prediction
-    neural_network.dump()
+        #Calibrate the ML predictor model to find best parameters
+        ML_predictor.calibrate(set_x, set_y)
+    #Dump the trained ML predictor model for later usage/prediction
+    ML_predictor.dump()
 
 ############################
 #        Prediction        #
@@ -122,12 +127,16 @@ elif path_predictionData != None:
     data_set = TaMERI_PC.create_dummy_variables(data_set, ['C', 'F', 'P'])
     #Preprocessing: Fit the data through the saved standard scaling
     data_set = TaMERI_PC.fit_data(data_set)
-    #Create a neural network object
-    neural_network = TaMERI_NN.neural_network()
-    #Load the trained neural network model from disk
-    neural_network.load()
-    #Calculate predictions with the neural network model
-    predictions = neural_network.predict(data_set)
+    #Create a ML predictor model object
+    ML_predictor = None
+    if validation_ML_algorithm == "NN":
+        ML_predictor = TaMERI_NN.neural_network()
+    elif validation_ML_algorithm == "RF":
+        ML_predictor = TaMERI_RF.random_forest()
+    #Load the previously trained ML predictor model from disk
+    ML_predictor.load()
+    #Calculate predictions with the ML predictor model
+    predictions = ML_predictor.predict(data_set)
     #Output the predictions to console
     print(predictions)
 
