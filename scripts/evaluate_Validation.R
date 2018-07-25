@@ -17,8 +17,12 @@ if (length(args) != 1) {
 }
 
 #DEBUG - START
-args <- c("/home/domey/Studium-Shit/Master/SS_2018/Masterarbeit/working_dir/TaMERI/data/")
+args <- c("/home/domey/Studium-Shit/Master/SS_2018/Masterarbeit/working_dir/TaMERI/data/results_RF")
 #DEBUG - END
+
+#Parameter
+data_set <- "homo_sapiens"
+ML_algorithm <- "Random Forest"
 
 #List all cross-validation folds in the data directory
 folds <- list.files(args[1], pattern="cv\\.fold_.*\\.tsv") %>%
@@ -52,7 +56,10 @@ plotVS <- ggplot(cv_dt, aes(real, pred, col=fold)) +
   theme(legend.position="none") +
   xlab("TM/EM ER ratio - Observed") + 
   ylab("TM/EM ER ratio - Predicted") + 
-  ggtitle("5-fold cross-validation of TaMERI", "Data set: homo_sapiens")
+  ggtitle("5-fold cross-validation of TaMERI", 
+          paste(paste("ML algorithm:", ML_algorithm, sep=" "),
+                paste("Data set:", data_set, sep=" "), sep="\n"
+          ))
 outputPath = file.path("plots",
                        paste("predictive_power", "scatterplot", "png", sep="."))
 png(outputPath, 1600,1200, res=180)
@@ -76,12 +83,18 @@ acc_df <- lapply(diff_cutoffs, calc_accuracy, ae) %>%
 #Plot accurcy vs absolute error cutoff
 plotAcc <- ggplot(acc_df, aes(abs_error_cutoff, accuracy, col=fold)) + 
   geom_line(size=1) +   
-  geom_vline(xintercept=0.02, linetype="dashed", col="black") + 
-  scale_x_continuous(limits=c(0,0.1),  
-    breaks = round(seq(min(acc_df$abs_error_cutoff), max(acc_df$abs_error_cutoff), by = 0.01),2)) + 
+  geom_vline(xintercept=0.0025, linetype="dashed", col="black") + 
+  scale_x_continuous(limits=c(0,0.03),
+                     breaks = round(seq(0, 0.03, by = 0.0025),4)) + 
+  scale_y_continuous(limits=c(0.4,1.0),
+                     breaks = round(seq(min(acc_df$accuracy), 1.0, by = 0.05), 1)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
   xlab("Absolute error cutoff") + 
   ylab("Accuracy") + 
-  ggtitle("5-fold cross-validation of TaMERI", "Data set: homo_sapiens")
+  ggtitle("5-fold cross-validation of TaMERI", 
+          paste(paste("ML algorithm:", ML_algorithm, sep=" "),
+                paste("Data set:", data_set, sep=" "), sep="\n"
+                ))
 outputPath = file.path("plots",
                        paste("predictive_power", "accuracy", "png", sep="."))
 png(outputPath, 1600,1200, res=220)
