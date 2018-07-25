@@ -42,17 +42,18 @@ class random_forest:
             self.model = pickle.load(rf_load)
 
     #Automatically identify best parameters for the random forest model
-    # def calibrate(self, x, y):
-    #     self.model = MLPRegressor(max_iter=15000)
-    #     param_grid = [{'activation':['identity', 'logistic', 'tanh', 'relu'],
-    #                 'solver':['lbfgs', 'adam', 'sgd'],
-    #                 'hidden_layer_sizes':[(1), (2), (3), (4), (5), (6), (7), (8), (9), (10),
-    #                 (1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10),
-    #                 (15), (20), (15,15), (20,20), (10,5), (5,10), (3,5), (5,3)]}]
-    #     clf = GridSearchCV(self.model, param_grid, cv=5, scoring='neg_mean_absolute_error')
-    #     clf.fit(x,y)
-    #     self.dump()
-    #
-    #     print("Best parameters set found on development set:")
-    #     print(str(clf.best_score_) + "\t" + str(clf.best_params_))
-    #     print(str(clf.cv_results_))
+    def calibrate(self, x, y):
+        self.model = RandomForestRegressor(random_state=0)
+        param_grid = {"n_estimators": [200, 500],
+            "max_depth": [3, None],
+            "max_features": ['auto', 'sqrt', 1, 3, 5, 10],
+            "min_samples_split": [2, 5, 10],
+            "min_samples_leaf": [1, 2, 3, 5, 7, 8, 9, 10],
+            "bootstrap": [True, False]}
+        clf = GridSearchCV(self.model, param_grid, cv=5, scoring='r2', n_jobs=-1)
+        clf.fit(x,y)
+        self.dump()
+
+        print("Best parameters set found on development set:")
+        print(str(clf.best_score_) + "\t" + str(clf.best_params_))
+        print(str(clf.cv_results_))
