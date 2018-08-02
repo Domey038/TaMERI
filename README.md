@@ -5,7 +5,9 @@ Prediction of 'TrAnsMembrane Evolutionary Rate Influence' (TaMERI) via Machine l
 ## Prerequisites
 
 Python (version >= 3.5), Korbinian and a UniProt flat file containing transmembrane proteins
+
 R with the libraries: ['data.table', 'magrittr', 'tidyr', 'ggplot2', 'stringr']
+
 Perl
 
 ### Installing
@@ -34,8 +36,11 @@ The validation process to automatically run a 5-fold cross-validation, calculate
 ## Author
 
 Dominik Müller
+
 Email: ga37xiy@tum.de
+
 Dmitrij Frishman lab - Department of Genome-Oriented Bioinformatics
+
 Technical University of Munich
 
 ## License
