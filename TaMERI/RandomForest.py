@@ -10,12 +10,12 @@ from sklearn.model_selection import GridSearchCV
 #-----------------------------------------------------#
 #            Fixed random forest parameters           #
 #-----------------------------------------------------#
-fixed_n_estimators = 5000
+fixed_n_estimators = 100
 fixed_max_depth = None
 fixed_max_features = 'sqrt'
-fixed_min_samples_split = 2
-fixed_min_samples_leaf = 9
-fixed_bootstrap = True
+fixed_min_samples_split = 10
+fixed_min_samples_leaf = 1
+fixed_bootstrap = False
 
 #-----------------------------------------------------#
 #          Functions of class random_forest           #
@@ -28,7 +28,7 @@ class random_forest:
     def __init__(self):
         self.model = RandomForestRegressor(random_state=0, n_estimators=fixed_n_estimators, max_depth=fixed_max_depth,
                                             min_samples_split=fixed_min_samples_split, min_samples_leaf=fixed_min_samples_leaf,
-                                            bootstrap=fixed_bootstrap)
+                                            max_features=fixed_max_features, bootstrap=fixed_bootstrap)
 
     #Train the random forest model according to provided training data set
     def train(self, train_x, train_y):
@@ -55,8 +55,8 @@ class random_forest:
         param_grid = {"n_estimators": [50, 100, 150, 200, 500, 1000, 2500, 5000],
             "max_depth": [3, None],
             "max_features": ['auto', 'sqrt', 1, 3, 5, 10],
-            "min_samples_split": [2, 5, 10],
-            "min_samples_leaf": [1, 2, 3, 5, 7, 8, 9, 10],
+            "min_samples_split": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "bootstrap": [True, False]}
         clf = GridSearchCV(self.model, param_grid, cv=5, scoring='r2', n_jobs=-1)
         clf.fit(x,y)
