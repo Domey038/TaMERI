@@ -15,7 +15,7 @@ import RandomForest as TaMERI_RF
 #-----------------------------------------------------#
 #                 Validation functions                #
 #-----------------------------------------------------#
-#Perform a cross-validation for the neural network and calculate evaluation measurements
+#Perform a cross-validation for the machine learning predictor and calculate evaluation measurements
 def cross_validation(set_x, set_y, validation_ML_algorithm):
     #create a 5-fold cross-validation of the data set
     cross_val_folds = KFold(n_splits=5)
