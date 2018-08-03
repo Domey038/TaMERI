@@ -18,10 +18,11 @@ def read_TaMERI_tsv(path):
     #Assign protein ids as index for each row
     #data_set = data_set.set_index('id')
     data_set = data_set.drop('id', axis=1)
-    #convert gene ontology terms into lists (instead of default strings)
+    #convert gene ontology and uniprot keyword terms into lists (instead of default strings)
     data_set = data_set.assign(F=data_set.F.str.strip('[]').str.split(','))
     data_set = data_set.assign(C=data_set.C.str.strip('[]').str.split(','))
     data_set = data_set.assign(P=data_set.P.str.strip('[]').str.split(','))
+    data_set = data_set.assign(uniprot_KWs=data_set.uniprot_KWs.str.strip('[]').str.split(','))
     #return input data set
     return data_set
 

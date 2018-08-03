@@ -10,7 +10,7 @@ from sklearn.model_selection import GridSearchCV
 #-----------------------------------------------------#
 #           Fixed neural network parameters           #
 #-----------------------------------------------------#
-fixed_hidden_layer_sizes = (10)
+fixed_hidden_layer_sizes = (15)
 fixed_max_iters = 15000
 fixed_activation = 'tanh'
 fixed_solver = 'lbfgs'
@@ -48,10 +48,16 @@ class neural_network:
 
     #Automatically identify best parameters for the neural network
     def calibrate(self, x, y):
+        # start = 1
+        # stop = 11
+        # step = 1
+        # ranges = [(n, min(n+step, stop)) for n in xrange(start, stop, step)]
+        # print(ranges)
         self.model = MLPRegressor(max_iter=15000, random_state=0)
         param_grid = [{'activation':['identity', 'logistic', 'tanh', 'relu'],
                     'solver':['lbfgs', 'adam', 'sgd'],
                     'hidden_layer_sizes':[(1), (2), (3), (4), (5), (6), (7), (8), (9), (10),
+                    (50),(100),(150),(200),(250),(300),(350),(400),(500),(550),(600),(750),
                     (1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,10),
                     (15), (20), (15,15), (20,20), (10,5), (5,10), (3,5), (5,3)]}]
         clf = GridSearchCV(self.model, param_grid, cv=5, scoring='neg_mean_absolute_error', n_jobs=-1)

@@ -55,7 +55,7 @@ class random_forest:
         param_grid = {"n_estimators": [50, 100, 150, 200, 500, 1000, 2500, 5000],
             "max_depth": [3, None],
             "max_features": ['auto', 'sqrt', 1, 3, 5, 10],
-            "min_samples_split": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
             "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "bootstrap": [True, False]}
         clf = GridSearchCV(self.model, param_grid, cv=5, scoring='r2', n_jobs=-1)

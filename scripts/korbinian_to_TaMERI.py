@@ -45,6 +45,10 @@ def read_UniProt(pathUniProt):
     uniprot_id = None
     isTM = None
     goTerms = []
+    kwString = ""
+    binding_sites = 0
+    np_binding = 0
+    glyo = 0
     openEntry = False
     #Start reading through the UniProt file
     with open(pathUniProt, 'r') as uniprotFILE:
@@ -66,18 +70,60 @@ def read_UniProt(pathUniProt):
                 patternGO = re.search('^DR\s+GO;\s(GO:[0-9]+);', line)
                 go_term = patternGO.group(1)
                 goTerms.append(go_term)
+            #IF entry contains uniprot keywords -> save
+            elif re.match("^KW\s+.*", line):
+                patternKW = re.search('^KW\s+(.*)', line)
+                kwString = kwString + patternKW.group(1)
+            #IF entry contains any functional site annotations -> save
+            elif re.match("FT\s+CARBOHYD\s+.*", line):
+                glyo += 1
+            elif re.match("FT\s+NP_BIND\s+.*", line):
+                np_binding += 1
+            elif re.match("FT\s+BINDING\s+.*", line):
+                binding_sites += 1
             #IF entry ended
             elif line.startswith("//"):
                 #IF protein is a alpha helical TM protein -> save it into cache
                 if isTM:
-                    uniprot_protein = (uniprot_id, goTerms)
+                    #process uniprot keywords into a list
+                    kwString = kwString[:-1]
+                    kwString = re.sub('\s?\{.*\}', '', kwString)
+                    kwTerms = re.split(";\s?", kwString)
+                    #save into protein_list cache
+                    uniprot_protein = (uniprot_id, goTerms, binding_sites, np_binding, glyo, kwTerms)
                     protein_list.append(uniprot_protein)
                 #clear variables
                 uniprot_id = None
                 isTM = False
                 goTerms = []
+                kwString = ""
                 openEntry = False
+                binding_sites = 0
+                np_binding = 0
+                glyo = 0
     return protein_list
+
+#-----------------------------------------------------#
+#        Extract and parse UniProt information        #
+#-----------------------------------------------------#
+def extract_UniProt_information(protein_list):
+    #initialize panda data frame
+    df = pd.DataFrame()
+    #iterate over each protein
+    for protein_tuple in protein_list:
+        #extract information
+        uniprot_id = protein_tuple[0]
+        counter_bs = protein_tuple[2]
+        counter_nbs = protein_tuple[3]
+        counter_gy = protein_tuple[4]
+        kw_terms = protein_tuple[5]
+        #Add protein to dataframe
+        df = df.append({'id': uniprot_id,
+                        'binding_sites_number': counter_bs,
+                        'nucleotide_bs_number': counter_nbs,
+                        'Glyco_number': counter_gy,
+                        'uniprot_KWs': kw_terms}, ignore_index=True)
+    return df
 
 #-----------------------------------------------------#
 #                  Run goslimviewer                   #
@@ -142,6 +188,8 @@ list_number = summary_path_list[-1]
 path_cr_csv = os.path.join(args.args_korbinian, "List" + list_number + "_cr_summary.csv")
 data_set = pd.read_csv(path_cr_csv, sep=",")
 TaMERI_df = data_set[['protein_name', 'AAIMON_slope_all_TMDs_mean', 'number_of_TMDs']]
+# TaMERI_df = data_set[['protein_name', 'AAIMON_slope_all_TMDs_mean', 'number_of_TMDs', 'AAIMON_n_homol',
+#                   'TM01_SW_q_gaps_per_q_residue_mean', 'obs_changes_mean']]
 TaMERI_df = TaMERI_df.rename(columns={'protein_name': 'id', 'AAIMON_slope_all_TMDs_mean': 'ER_ratio',
                                      'number_of_TMDs': 'TM_regions'}, inplace=False)
 # TaMERI_df = data_set[['protein_name', 'AAIMON_mean_all_TM_res', 'number_of_TMDs']]
@@ -151,15 +199,27 @@ TaMERI_df = TaMERI_df.rename(columns={'protein_name': 'id', 'AAIMON_slope_all_TM
 #Read simple csv file
 path_simple_csv = os.path.join(args.args_korbinian, "List" + list_number + ".csv")
 data_set = pd.read_csv(path_simple_csv, sep=",", low_memory=False)
-temporary_df = data_set[['protein_name', 'perc_TMD', 'seqlen']]
-temporary_df = temporary_df.rename(columns={'protein_name': 'id', 'perc_TMD': 'TM_proportion',
+useful_cols = ["protein_name", "multipass", "number_of_SP", "seqlen",
+               "singlepass", "typeI", "typeII", "TM01_start",
+               "perc_TMD", "len_TMD_mean", "TM01_lipo",
+               "lipo_mean_all_TM_res", "lipo_last_TMD",
+               "Cell_membrane", "Endoplasmic_reticulum", "Golgi_apparatus",
+               "GPCR", "olfactory_receptor"]
+korbinian_df = data_set[useful_cols]
+korbinian_df = korbinian_df.rename(columns={'protein_name': 'id', 'perc_TMD': 'TM_proportion',
                                             'seqlen': 'sequence_length'}, inplace=False)
 
 #Merge the two panda data frames
-TaMERI_df = TaMERI_df.merge(temporary_df, left_on='id', right_on='id', how='inner')
+TaMERI_df = TaMERI_df.merge(korbinian_df, left_on='id', right_on='id', how='inner')
 
 #Read uniprot file
 protein_list = read_UniProt(args.args_uniprot)
+
+#Extract binding sites etc information out of protein_list
+uniprot_df = extract_UniProt_information(protein_list)
+
+#Merge uniprot information results with the TaMERI data frame
+TaMERI_df = TaMERI_df.merge(uniprot_df, left_on='id', right_on='id', how='inner')
 
 #Run goslimviewer
 # slim set can be "generic", "metagenomics", "goa", "panther", "pir", "plant", "tigr", "yeast"
@@ -177,8 +237,8 @@ GO_df = pd.DataFrame.from_dict(go_classification, orient='index')
 TaMERI_df = TaMERI_df.merge(GO_df, left_on='id', right_index=True, how='inner')
 
 #Reorder the columns
-cols = ['id', 'sequence_length', 'TM_regions', 'TM_proportion', 'C', 'F', 'P', 'ER_ratio']
-TaMERI_df = TaMERI_df[cols]
+#cols = ['id', 'sequence_length', 'TM_regions', 'TM_proportion', 'C', 'F', 'P', 'ER_ratio']
+#TaMERI_df = TaMERI_df[cols]
 
 #output
 TaMERI_df.to_csv(args.args_out, sep="\t", index=False, header=True)

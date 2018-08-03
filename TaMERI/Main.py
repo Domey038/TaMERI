@@ -26,17 +26,18 @@ class MyParser(argparse.ArgumentParser):
         sys.exit(2)
 #Initialize the modifed argument parser
 parser = MyParser(formatter_class=argparse.RawDescriptionHelpFormatter, add_help=False, description=
-    """TaMERI: TrAnsMembrane Evolutionary Rate Influence - Neural network predictor
+    """TaMERI: TrAnsMembrane Evolutionary Rate Influence - Machine learning predictor
 Prediction of transmembrane influence on the evolutionary rate of membrane proteins through protein determinants.
-Trained on AAIMON rates from the Korbinian pipeline as representative for TM/EM ER ratios.
+Trained on AAIMON slopes from the Korbinian pipeline as representative for TM/EM ER ratios.
 
 Example usage:
-python TaMERI/main.py -t data/training_set.TaMERI.tsv
+python TaMERI/main.py -t data/training_set.TaMERI.tsv -c
 python TaMERI/main.py -p data/test_set.TaMERI.tsv
+python TaMERI/main.py -v data/test_set.TaMERI.tsv
 
 Author: Dominink Müller
 Email: ga37xiy@tum.de
-Lab: Frishman lab - TUM Weihenstephan (Germany)
+Lab: Dmitrij Frishman lab - TUM Weihenstephan (Germany)
 """)
 #Add arguments for mutally exclusive required group
 required_group = parser.add_argument_group(title='TaMERI modi')
@@ -110,7 +111,7 @@ if path_trainingData != None:
     #Preprocessing: Split data and results of the data set
     set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "ER_ratio")
     #Preprocessing: Transform categorical features into dummy variables
-    set_x = TaMERI_PC.create_dummy_variables(set_x, ['C', 'F', 'P'])
+    set_x = TaMERI_PC.create_dummy_variables(set_x, ['C', 'F', 'P', 'uniprot_KWs'])
     #Preprocessing: Create and fit data through standard scaling
     TaMERI_PC.create_fitting(set_x)
     set_x = TaMERI_PC.fit_data(set_x)
@@ -136,7 +137,7 @@ elif path_predictionData != None:
     #Read data set in TaMERI-input.tsv format or in an UniProt flat file format
     data_set = TaMERI_IR.read_TaMERI_tsv(path_predictionData)
     #Preprocessing: Transform categorical features into dummy variables
-    data_set = TaMERI_PC.create_dummy_variables(data_set, ['C', 'F', 'P'])
+    data_set = TaMERI_PC.create_dummy_variables(data_set, ['C', 'F', 'P', 'uniprot_KWs'])
     #Preprocessing: Fit the data through the saved standard scaling
     data_set = TaMERI_PC.fit_data(data_set)
     #Create a ML predictor model object
@@ -164,7 +165,7 @@ elif path_validationData != None:
     #Preprocessing: Split data and results of the data set
     set_x, set_y = TaMERI_PC.split_data_from_results(data_set, "ER_ratio")
     #Preprocessing: Transform categorical features into dummy variables
-    set_x = TaMERI_PC.create_dummy_variables(set_x, ['C', 'F', 'P'])
+    set_x = TaMERI_PC.create_dummy_variables(set_x, ['C', 'F', 'P', 'uniprot_KWs'])
     #Preprocessing: Create and fit data through standard scaling
     TaMERI_PC.create_fitting(set_x)
     set_x = TaMERI_PC.fit_data(set_x)
