@@ -8,7 +8,7 @@ Python (version >= 3.5), Korbinian and a UniProt flat file containing transmembr
 R with the libraries: ['data.table', 'magrittr', 'tidyr', 'ggplot2', 'stringr']\
 Perl
 
-### Installing
+## Installing
 
 Run the setup.py python script to install all required module dependencies.
 > python setup.py install
