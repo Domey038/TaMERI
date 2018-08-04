@@ -63,8 +63,9 @@ acc_df <- lapply(diff_cutoffs, calc_accuracy, ae) %>%
 
 #Plot accurcy vs absolute error cutoff
 plotAcc <- ggplot(acc_df, aes(abs_error_cutoff, accuracy, col=fold)) + 
-  geom_line(size=1) +   
   geom_vline(xintercept=0.0025, linetype="dashed", col="black") + 
+  geom_vline(xintercept=0.0050, linetype="dashed", col="black") +
+  geom_line(size=1) +   
   scale_x_continuous(limits=c(0,0.03),
                      breaks = round(seq(0, 0.03, by = 0.0025),4)) + 
   scale_y_continuous(limits=c(0,1.0),
