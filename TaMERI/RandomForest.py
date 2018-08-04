@@ -10,10 +10,10 @@ from sklearn.model_selection import GridSearchCV
 #-----------------------------------------------------#
 #            Fixed random forest parameters           #
 #-----------------------------------------------------#
-fixed_n_estimators = 100
+fixed_n_estimators = 5000
 fixed_max_depth = None
 fixed_max_features = 'sqrt'
-fixed_min_samples_split = 10
+fixed_min_samples_split = 2
 fixed_min_samples_leaf = 1
 fixed_bootstrap = False
 
