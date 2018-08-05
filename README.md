@@ -41,8 +41,18 @@ The validation process to automatically run a 5-fold cross-validation as Random 
 
 ## Results
 
-TODO:\
-Add the cross-validation result plots
+### Random Forest
+
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+
+![Predictions vs Observations](https://github.com/Domey038/TaMERI/blob/master/data/cv_results.RF/predictive_power.scatterplot.png)
+![Absolute Error vs Observed](https://github.com/Domey038/TaMERI/blob/master/data/cv_results.RF/error_vs_observed.png)
+
+### Neural Network
+TODO
 
 ## Author
 
