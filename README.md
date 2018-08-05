@@ -39,13 +39,6 @@ The 't' argument represents the training modus with the 'c' argument for calibra
 The validation process to automatically run a 5-fold cross-validation as Random Forest (RF), calculate MAE+MVS+R2 values and create plots for better evaluation through the Rscript "scripts/evaluate_Validation.R".
 > python TaMERI/Mainy.py -v data/TaMERI.homo_sapiens.tsv -RF
 
-## Author
-
-Dominik Müller\
-Email: ga37xiy@tum.de\
-Dmitrij Frishman lab - Department of Genome-Oriented Bioinformatics\
-Technical University of Munich
-
 ## Results
 
 | ML algorithm   | Mean absolute error | Explained Variance | R2          |
@@ -59,8 +52,12 @@ Technical University of Munich
 
 ![Absolute Error vs Observed](https://github.com/Domey038/TaMERI/blob/master/data/cv_results.RF/error_vs_observed.png)
 
-###
-TODO
+## Author
+
+Dominik Müller\
+Email: ga37xiy@tum.de\
+Dmitrij Frishman lab - Department of Genome-Oriented Bioinformatics\
+Technical University of Munich
 
 ## License
 
