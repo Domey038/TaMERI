@@ -73,16 +73,17 @@ def dump_results(data_list, result_list, validation_ML_algorithm):
     cv_dataPATH = os.path.join(results_dir, "data.tsv")
     with open(cv_dataPATH, 'w') as data_dumper:
         #write header
-        data_dumper.write("real" + "\t" + "pred" + "\t" + "fold" + "\n")
+        data_dumper.write("id" + "\t" + "real" + "\t" + "pred" + "\t" + "fold" + "\n")
         #iterate over each saved fold_tuple
         for fold_tuple in data_list:
             #parse variables
             pred = fold_tuple[0]
             real = fold_tuple[1].tolist()
+            uniprot_ids = fold_tuple[1].index.tolist()
             fold = fold_tuple[2]
             #print data to file for each sample
             for i, p in enumerate(pred):
-                data_dumper.write(str(real[i]) + "\t" + str(p) + "\t" + str(fold) + "\n")
+                data_dumper.write(str(uniprot_ids[i]) + "\t" + str(real[i]) + "\t" + str(p) + "\t" + str(fold) + "\n")
     #Dump cross validation results
     cv_resultsPATH = os.path.join(results_dir, "scores.tsv")
     with open(cv_resultsPATH, 'w') as result_dumper:
