@@ -43,7 +43,7 @@ The validation process to automatically run a 5-fold cross-validation as Random 
 
 | ML algorithm   | Mean absolute error | Explained Variance | R2          |
 | -------------- | ------------------- | ------------------ | ----------- |
-| Random Forest  | 004483838           | 0.295379395        | 0.293230108 |
+| Random Forest  | 0.004483838         | 0.295379395        | 0.293230108 |
 | Neural Network | X                   | X                  | X           |
 
 
